@@ -1,4 +1,21 @@
 #!/bin/bash
+###########################################################################
+# SmartIDE - Dev Containers
+# Copyright (C) 2023 leansoftX.com
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+###########################################################################
 
 USER_UID=${LOCAL_USER_UID:-1000}
 USER_GID=${LOCAL_USER_GID:-1000}
@@ -31,7 +48,7 @@ if [ $USER_UID == '0' ]; then
     /usr/sbin/sshd
 
     echo "-----------Starting ide"
-    exec /home/opvscode/server.sh "$@"
+    exec /home/smartide/.nvm/versions/node/v16.9.1/bin/node /home/opvscode/out/server-main.js --host 0.0.0.0 --without-connection-token
 
 else
 
@@ -58,7 +75,8 @@ else
     # chmod g+rw /home
     chown -R $USERNAME:$USERNAME /home/project
     chown -R $USERNAME:$USERNAME /home/opvscode
-    chmod +x /home/opvscode/server.sh
+    chown -R $USERNAME:$USERNAME /home/$USERNAME/.ssh
+    # chmod +x /home/opvscode/server.sh
 
     echo "root:$USER_PASS" | chpasswd
     echo "smartide:$USER_PASS" | chpasswd
@@ -72,6 +90,8 @@ else
     /usr/sbin/sshd
 
     echo "-----smartide-----Starting gosu ide"
-    exec gosu smartide /home/opvscode/server.sh "$@"
+    #su smartide -c  "/home/smartide/.nvm/versions/node/v16.9.1/bin/node /home/opvscode/out/server-main.js --host 0.0.0.0 --without-connection-token"
+    exec su smartide -c "/home/smartide/.nvm/versions/node/v16.9.1/bin/node /home/opvscode/out/server-main.js --host 0.0.0.0 --without-connection-token"
+    # exec gosu smartide /home/opvscode/server.sh "$@"
 
 fi

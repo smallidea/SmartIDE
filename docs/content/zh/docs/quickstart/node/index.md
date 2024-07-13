@@ -24,7 +24,7 @@ SmartIDE内置了node.js开发环境模板，你可以通过一个简单的指�
 # 执行以下命令
 mkdir sample-node-vscode 
 cd sample-node-vscode  
-smartide new node -t vscode
+smartide new node -T vscode
 ```
 
 运行后的效果如下，你可以通过命令窗口中的日志详细了解 SmartIDE 的启动过程，当 SmartIDE 启动完毕之后，会自动打开浏览器窗口并导航 WebIDE 界面。
@@ -200,7 +200,7 @@ smartide start https://gitee.com/smartide/sample-node-vscode
 ```
 mkdir sample-node-webstorm
 cd sample-node-webstorm
-smartide new node -t webstorm
+smartide new node -T webstorm
 ```
 
 运行后的效果如下，你可以通过命令窗口中的日志详细了解 SmartIDE 的启动过程，当 SmartIDE 启动完毕之后，会自动打开浏览器窗口并导航 WebIDE 界面。
@@ -309,7 +309,7 @@ smartide start https://gitee.com/smartide/sample-node-webstorm
 # 执行以下命令
 mkdir sample-node-opensumi 
 cd sample-node-opensumi 
-smartide new node -t opensumi
+smartide new node -T opensumi
 ```
 
 运行后的效果如下，你可以通过命令窗口中的日志详细了解 SmartIDE 的启动过程，当 SmartIDE 启动完毕之后，会自动打开浏览器窗口并导航 WebIDE 界面。
@@ -471,9 +471,9 @@ smartide start https://gitee.com/smartide/sample-node-opensumi
 
 在这个过程中你的项目代码也已经具备了远程开发的能力，你可以按照以下文档中的说明使用任意一种远程工作区来开发调试你的应用
 
-- [远程主机工作区](/zh/docs/overview/workspace/#远程主机工作区)
-- [k8s工作区](/zh/docs/overview/workspace/#k8s工作区)
-- [Server工作区](/zh/docs/overview/workspace/#server工作区)
+- [远程主机工作区](/zh/docs/overview/remote-workspace/#远程主机工作区)
+- [k8s工作区](/zh/docs/overview/remote-workspace/#k8s工作区)
+- [Server工作区](/zh/docs/overview/remote-workspace/#server工作区)
 
 另外，你也可以通过VSCode或者JetBrains内置的远程开发模式进行Hybird模式的远程开发，具体请参考
 

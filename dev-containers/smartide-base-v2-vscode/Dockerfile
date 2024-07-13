@@ -1,10 +1,24 @@
-#################################################
-# SmartIDE Developer Container Image
-# Licensed under GPL v3.0
-# Copyright (C) leansoftX.com
-#################################################
+###########################################################################
+# SmartIDE - Dev Containers
+# Copyright (C) 2023 leansoftX.com
 
-FROM registry.cn-hangzhou.aliyuncs.com/smartide/smartide-base-v2:2719
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+###########################################################################
+
+FROM --platform=$TARGETPLATFORM registry.cn-hangzhou.aliyuncs.com/smartide/smartide-base-v2:latest
+ARG TARGETPLATFORM 
+ARG PLATFORM
 
 
 USER smartide
@@ -22,7 +36,11 @@ ENV NVM_DIR /home/smartide/.nvm
 RUN curl -fsSL https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | sh \
     && . $NVM_DIR/nvm.sh  \
     && nvm install $NODE_VERSION \
+    && nvm install 12.22.7 \
+    && nvm install 16.9.1 \
     && nvm alias default $NODE_VERSION \
+    && nvm use $NODE_VERSION \
+    && npm install -g yarn node-gyp \
     && echo ". ~/.nvm/nvm-lazy.sh"  >> /home/smartide/.bashrc.d/50-node
 # above, we are adding the lazy nvm init to .bashrc, because one is executed on interactive shells, the other for non-interactive shells (e.g. plugin-host)
 COPY --chown=smartide:smartide nvm-lazy.sh /home/smartide/.nvm/nvm-lazy.sh
@@ -36,8 +54,19 @@ RUN echo "export NVM_DIR_ROOT=\"/home/smartide/.nvm\"" >> /etc/profile && \
     echo "[ -s \"\$NVM_DIR_ROOT/bash_completion\" ] && \. \"\$NVM_DIR_ROOT/bash_completion\""  >> /etc/profile
 
 WORKDIR /home
+
+
+# COPY openvscode-images-arm64 opvscode
+COPY openvscode-images-arm64 opvscode-arm64
+COPY openvscode-images-amd64 opvscode-amd64
+
+
+
 #复制IDE文件
-COPY openvscode-images opvscode
+SHELL ["/bin/bash", "-c"]
+RUN if [ "$TARGETPLATFORM" = "linux/arm64" ];then mv opvscode-arm64/* opvscode;mv opvscode/bin/remote-cli/openvscode-server opvscode/bin/remote-cli/code;else mv opvscode-amd64/* opvscode;mv opvscode/bin/remote-cli/openvscode-server opvscode/bin/remote-cli/code;fi
+
+
 
 ENV LANG=C.UTF-8 \
     LC_ALL=C.UTF-8 \
@@ -46,7 +75,21 @@ ENV LANG=C.UTF-8 \
     GIT_EDITOR="code --wait" \
     OPENVSCODE_SERVER_ROOT=/home/opvscode
 
+RUN  ln -sf /home/smartide/.nvm/versions/node/v$NODE_VERSION/bin/node /home/opvscode
+
+
 COPY gosu_entrypoint_base.sh /idesh/gosu_entrypoint_base.sh
 RUN chmod +x /idesh/gosu_entrypoint_base.sh
 
+WORKDIR opvscode
+RUN find ./  -name "*.js" | xargs perl -pi -e 's|https://open-vsx.org|https://marketplace.smartide.cn|g' 
+RUN find ./  -name "*.json" | xargs perl -pi -e 's|https://open-vsx.org|https://marketplace.smartide.cn|g'
+
 ENTRYPOINT ["/idesh/gosu_entrypoint_base.sh"]
+
+# COPY openvscode.service /lib/systemd/system/
+# COPY startup-openvscode.sh /idesh/startup-openvscode.sh
+
+# RUN chmod +x /idesh/startup-openvscode.sh &&                               \
+#     ln -sf /lib/systemd/system/openvscode.service                    \
+#        /etc/systemd/system/multi-user.target.wants/openvscode.service
